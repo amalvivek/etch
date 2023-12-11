@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import BoxGrid from '@/components/BoxGrid.vue'
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="overflow-hidden">
+    <BoxGrid class="overflow-hidden" />
+  </div>
 </template>
