@@ -29,14 +29,6 @@ for (let x = 0; x < props.canvasSize; x++) {
   }
 }
 
-// const gridData = ref<CellData[]>(
-//   Array.from({ length: cellCount }, (_, index) => ({
-//     index: index + 1,
-//     colour: 'bg-slate-600',
-//     isActive: index === activeIndex.value
-//   }))
-// )
-
 const gridData = ref<CellData[][]>(
   Array.from({ length: props.canvasSize }, (_, index) =>
     Array.from({ length: props.canvasSize }, (_, index2) => ({
@@ -56,8 +48,14 @@ const grid = ref<HTMLDivElement | null>(null)
 const xCoord = ref<number>(0)
 const yCoord = ref<number>(0)
 
+let scrolled: boolean = false
+
 const scrollToCell = (cell: ComponentPublicInstance, grid: HTMLDivElement | null) => {
-  if (cell && grid) {
+  if (cell && grid && !scrolled) {
+    scrolled = true
+    setTimeout(() => {
+      scrolled = false
+    }, 100)
     const gridRect = grid.getBoundingClientRect()
     const cellRect = cell.$el.getBoundingClientRect()
 
@@ -74,56 +72,42 @@ const scrollToCell = (cell: ComponentPublicInstance, grid: HTMLDivElement | null
   }
 }
 
-const onKeyUpAction = (e: KeyboardEvent) => {
+const onKeyDownAction = (e: KeyboardEvent) => {
+  e.preventDefault()
   switch (e.key) {
     case 'ArrowUp':
-      if (activeCoord.value[0] - 1 > 0) {
+      if (activeCoord.value[0] - 1 > -1) {
         gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
         activeCoord.value[0] -= 1
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
-        scrollToCell(
-          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
-          grid.value
-        )
       }
       break
     case 'ArrowDown':
       if (activeCoord.value[0] + 1 < props.canvasSize) {
         gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
         activeCoord.value[0] += 1
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
-        scrollToCell(
-          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
-          grid.value
-        )
       }
       break
     case 'ArrowLeft':
-      if (activeCoord.value[1] - 1 > 0) {
+      if (activeCoord.value[1] - 1 > -1) {
         gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
         activeCoord.value[1] -= 1
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
-        scrollToCell(
-          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
-          grid.value
-        )
       }
       break
     case 'ArrowRight':
       if (activeCoord.value[1] + 1 < props.canvasSize) {
         gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
         activeCoord.value[1] += 1
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
-        scrollToCell(
-          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
-          grid.value
-        )
       }
       break
 
     default:
       break
   }
+  gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
+  scrollToCell(
+    cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+    grid.value
+  )
 }
 
 onMounted(() => {
@@ -131,7 +115,7 @@ onMounted(() => {
     cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
     grid.value
   )
-  document.addEventListener('keyup', onKeyUpAction)
+  document.addEventListener('keydown', onKeyDownAction)
 })
 
 const gridStyle = computed(() => {
