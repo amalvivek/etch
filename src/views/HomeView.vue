@@ -3,7 +3,7 @@ import BoxGrid from '@/components/BoxGrid.vue'
 </script>
 
 <template>
-  <div class="overflow-hidden">
-    <BoxGrid class="overflow-hidden" />
+  <div class="overflow-hidden" @wheel.prevent @touchmove.prevent @scroll.prevent @keyup.up.prevent>
+    <BoxGrid class="overflow-hidden" :canvas-size="101" :cell-size="40" />
   </div>
 </template>

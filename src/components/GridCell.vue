@@ -10,38 +10,23 @@ const props = defineProps({
   }
 })
 
-const state = reactive({
-  id: props.cellData.index,
-  colour: props.cellData.colour,
-  active: props.cellData.isActive
-})
-
-const cell = ref<HTMLDivElement | null>(null)
-
-onMounted(() => {
-  if (active.value && cell.value) {
-    const cellRect = cell.value.getBoundingClientRect()
-    const centerX = window.innerWidth / 2
-    const centerY = window.innerHeight / 2
-
-    const scrollX = cellRect.left - centerX
-    const scrollY = cellRect.top - centerY
-
-    window.scrollBy({
-      left: scrollX,
-      top: scrollY,
-      behavior: 'smooth'
-    })
-  }
-})
-
-const { id, colour, active } = toRefs(state)
+const { index, colour, isActive } = toRefs(props.cellData)
 </script>
 
 <template>
-  <div class="h-full w-full border" :class="active ? `bg-gray-200` : colour">
-    {{ id }}
+  <div class="h-full w-full border" :class="colour">
+    <div v-if="isActive" class="h-full w-full blink_me bg-slate-100"></div>
   </div>
 </template>
 
-<style></style>
+<style>
+.blink_me {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+</style>
