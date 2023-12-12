@@ -11,6 +11,10 @@ const props = defineProps({
   cellSize: {
     type: Number,
     required: true
+  },
+  cursorColour: {
+    type: String,
+    required: true
   }
 })
 
@@ -77,32 +81,34 @@ const onKeyDownAction = (e: KeyboardEvent) => {
   switch (e.key) {
     case 'ArrowUp':
       if (activeCoord.value[0] - 1 > -1) {
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
-        activeCoord.value[0] -= 1
+        updateGrid(0, -1)
       }
       break
     case 'ArrowDown':
       if (activeCoord.value[0] + 1 < props.canvasSize) {
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
-        activeCoord.value[0] += 1
+        updateGrid(0, 1)
       }
       break
     case 'ArrowLeft':
       if (activeCoord.value[1] - 1 > -1) {
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
-        activeCoord.value[1] -= 1
+        updateGrid(1, -1)
       }
       break
     case 'ArrowRight':
       if (activeCoord.value[1] + 1 < props.canvasSize) {
-        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
-        activeCoord.value[1] += 1
+        updateGrid(1, 1)
       }
       break
 
     default:
       break
   }
+}
+
+const updateGrid = (index: number, increment: number) => {
+  gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
+  gridData.value[activeCoord.value[0]][activeCoord.value[1]].colour = props.cursorColour
+  activeCoord.value[index] += increment
   gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
   scrollToCell(
     cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
@@ -135,9 +141,10 @@ const gridStyle = computed(() => {
       <GridCell
         v-for="[x, y] in allCoords"
         :key="`${x},${y}`"
-        :cellData="gridData[x][y]"
+        :cell-data="gridData[x][y]"
         class="snap-center"
         :ref="(el) => cellRefs[x].push(el as ComponentPublicInstance)"
+        :cursor-colour="cursorColour"
       />
     </div>
   </div>
