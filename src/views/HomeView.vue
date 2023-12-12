@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import BoxGrid from '@/components/BoxGrid.vue'
+import { ref } from 'vue'
+
+const cursorColour: String = ref<String>('#F1F5F9')
 </script>
 
 <template>
@@ -8,7 +11,7 @@ import BoxGrid from '@/components/BoxGrid.vue'
       class="overflow-hidden"
       :canvas-size="101"
       :cell-size="40"
-      cursor-colour="bg-slate-100"
+      v-model:cursor-colour="cursorColour"
     />
   </div>
 </template>

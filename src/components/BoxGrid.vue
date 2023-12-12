@@ -3,6 +3,8 @@ import { ref, onMounted, computed, type ComponentPublicInstance, type Ref } from
 import GridCell from './GridCell.vue'
 import { type CellData } from '@/shared.types'
 
+const emit = defineEmits(['update:cursor-colour'])
+
 const props = defineProps({
   canvasSize: {
     type: Number,
@@ -38,7 +40,7 @@ const gridData = ref<CellData[][]>(
     Array.from({ length: props.canvasSize }, (_, index2) => ({
       x: index,
       y: index2,
-      colour: 'bg-slate-600',
+      colour: '#475569',
       isActive: index == activeCoord.value[0] && index2 == activeCoord.value[1]
     }))
   )
@@ -117,10 +119,12 @@ const updateGrid = (index: number, increment: number) => {
 }
 
 onMounted(() => {
-  scrollToCell(
-    cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
-    grid.value
-  )
+  setTimeout(() => {
+    scrollToCell(
+      cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+      grid.value
+    )
+  }, 0)
   document.addEventListener('keydown', onKeyDownAction)
 })
 
@@ -128,26 +132,51 @@ const gridStyle = computed(() => {
   //   return `transform: translateX(-${translateByX.value}px) translateY(-${translateByY.value}px); grid-template-rows: repeat(${canvasSize.value}, ${cellSize.value}px);  grid-template-columns: repeat(${canvasSize.value}, ${cellSize.value}px); grid-auto-rows: ${cellSize.value}px`
   return `grid-template-rows: repeat(${props.canvasSize}, ${props.cellSize}px);  grid-template-columns: repeat(${props.canvasSize}, ${props.cellSize}px); grid-auto-rows: ${props.cellSize}px`
 })
+
+const gridStartStyle = computed(() => {
+  return `repeat(${props.canvasSize}, 0px)`
+})
+
+const gridEndStyle = computed(() => {
+  return `repeat(${props.canvasSize}, ${props.cellSize}px)`
+})
+
+const emitCursorColourChange = (e: String) => {
+  emit('update:cursor-colour', e)
+}
 </script>
 
 <template>
   <div class="w-screen h-screen">
-    <div
-      ref="grid"
-      class="absolute grid snap-both snap-mandatory"
-      :style="gridStyle"
-      @keyup.up.prevent
-    >
+    <div ref="grid" class="absolute grid grow" :style="gridStyle" @keyup.up.prevent>
       <GridCell
         v-for="[x, y] in allCoords"
         :key="`${x},${y}`"
         :cell-data="gridData[x][y]"
-        class="snap-center"
         :ref="(el) => cellRefs[x].push(el as ComponentPublicInstance)"
         :cursor-colour="cursorColour"
+        @cursor-colour-change="emitCursorColourChange"
       />
     </div>
   </div>
 </template>
 
-<style></style>
+<style scoped>
+/* .grow {
+  animation: gridStartSize 3s cubic-bezier(0.37, 0.84, 0.95, 0.3);
+}
+
+@keyframes gridStartSize {
+  0% {
+    grid-template-rows: v-bind(gridStartStyle);
+    grid-template-columns: v-bind(gridStartStyle);
+    grid-auto-rows: 0px;
+  }
+} */
+
+.gridStyle {
+  grid-template-rows: v-bind(gridEndStyle);
+  grid-template-columns: v-bind(gridEndStyle);
+  grid-auto-rows: 0px;
+}
+</style>
