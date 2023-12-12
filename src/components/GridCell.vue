@@ -10,7 +10,7 @@ const props = defineProps({
   }
 })
 
-const { index, colour, isActive } = toRefs(props.cellData)
+const { x, y, colour, isActive } = toRefs(props.cellData)
 </script>
 
 <template>

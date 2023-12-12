@@ -1,5 +1,6 @@
 export interface CellData {
-    index: Number,
+    x: Number,
+    y: Number,
     colour: String,
     isActive: Boolean
 }

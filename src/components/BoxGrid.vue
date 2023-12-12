@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, type ComponentPublicInstance } from 'vue'
+import { ref, onMounted, computed, type ComponentPublicInstance, type Ref } from 'vue'
 import GridCell from './GridCell.vue'
 import { type CellData } from '@/shared.types'
 
@@ -14,21 +14,43 @@ const props = defineProps({
   }
 })
 
-// const canvasSize = 101
-// const cellSize = 40
 const cellCount = props.canvasSize * props.canvasSize
 
-const activeIndex = ref<number>(Math.floor(cellCount / 2))
+// const activeIndex = ref<number>(Math.floor(cellCount / 2))
 
-const gridData = ref<CellData[]>(
-  Array.from({ length: cellCount }, (_, index) => ({
-    index: index + 1,
-    colour: 'bg-slate-600',
-    isActive: index === activeIndex.value
-  }))
+const startingCoord = Math.floor(props.canvasSize / 2)
+const activeCoord: Ref<[number, number]> = ref<[number, number]>([startingCoord, startingCoord])
+
+const allCoords: Ref<[number, number][]> = ref<[number, number][]>([])
+
+for (let x = 0; x < props.canvasSize; x++) {
+  for (let y = 0; y < props.canvasSize; y++) {
+    allCoords.value.push([x, y])
+  }
+}
+
+// const gridData = ref<CellData[]>(
+//   Array.from({ length: cellCount }, (_, index) => ({
+//     index: index + 1,
+//     colour: 'bg-slate-600',
+//     isActive: index === activeIndex.value
+//   }))
+// )
+
+const gridData = ref<CellData[][]>(
+  Array.from({ length: props.canvasSize }, (_, index) =>
+    Array.from({ length: props.canvasSize }, (_, index2) => ({
+      x: index,
+      y: index2,
+      colour: 'bg-slate-600',
+      isActive: index == activeCoord.value[0] && index2 == activeCoord.value[1]
+    }))
+  )
 )
 
-const cellRefs = ref<ComponentPublicInstance[]>([])
+const cellRefs = ref<ComponentPublicInstance[][]>(
+  Array.from({ length: props.canvasSize }, () => [])
+)
 const grid = ref<HTMLDivElement | null>(null)
 
 const xCoord = ref<number>(0)
@@ -55,35 +77,47 @@ const scrollToCell = (cell: ComponentPublicInstance, grid: HTMLDivElement | null
 const onKeyUpAction = (e: KeyboardEvent) => {
   switch (e.key) {
     case 'ArrowUp':
-      if (activeIndex.value - 101 > 0) {
-        gridData.value[activeIndex.value].isActive = false
-        activeIndex.value -= 101
-        gridData.value[activeIndex.value].isActive = true
-        scrollToCell(cellRefs.value[activeIndex.value] as ComponentPublicInstance, grid.value)
+      if (activeCoord.value[0] - 1 > 0) {
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
+        activeCoord.value[0] -= 1
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
+        scrollToCell(
+          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+          grid.value
+        )
       }
       break
     case 'ArrowDown':
-      if (activeIndex.value + 101 < cellCount) {
-        gridData.value[activeIndex.value].isActive = false
-        activeIndex.value += 101
-        gridData.value[activeIndex.value].isActive = true
-        scrollToCell(cellRefs.value[activeIndex.value] as ComponentPublicInstance, grid.value)
+      if (activeCoord.value[0] + 1 < props.canvasSize) {
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
+        activeCoord.value[0] += 1
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
+        scrollToCell(
+          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+          grid.value
+        )
       }
       break
     case 'ArrowLeft':
-      if (activeIndex.value - 1 > 0) {
-        gridData.value[activeIndex.value].isActive = false
-        activeIndex.value -= 1
-        gridData.value[activeIndex.value].isActive = true
-        scrollToCell(cellRefs.value[activeIndex.value] as ComponentPublicInstance, grid.value)
+      if (activeCoord.value[1] - 1 > 0) {
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
+        activeCoord.value[1] -= 1
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
+        scrollToCell(
+          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+          grid.value
+        )
       }
       break
     case 'ArrowRight':
-      if (activeIndex.value + 1 > 0) {
-        gridData.value[activeIndex.value].isActive = false
-        activeIndex.value += 1
-        gridData.value[activeIndex.value].isActive = true
-        scrollToCell(cellRefs.value[activeIndex.value] as ComponentPublicInstance, grid.value)
+      if (activeCoord.value[1] + 1 < props.canvasSize) {
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
+        activeCoord.value[1] += 1
+        gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
+        scrollToCell(
+          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+          grid.value
+        )
       }
       break
 
@@ -93,7 +127,10 @@ const onKeyUpAction = (e: KeyboardEvent) => {
 }
 
 onMounted(() => {
-  scrollToCell(cellRefs.value[activeIndex.value] as ComponentPublicInstance, grid.value)
+  scrollToCell(
+    cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+    grid.value
+  )
   document.addEventListener('keyup', onKeyUpAction)
 })
 
@@ -112,11 +149,11 @@ const gridStyle = computed(() => {
       @keyup.up.prevent
     >
       <GridCell
-        v-for="i in cellCount"
-        :key="i"
-        :cellData="gridData[i - 1]"
+        v-for="[x, y] in allCoords"
+        :key="`${x},${y}`"
+        :cellData="gridData[x][y]"
         class="snap-center"
-        :ref="(el) => cellRefs.push(el as ComponentPublicInstance)"
+        :ref="(el) => cellRefs[x].push(el as ComponentPublicInstance)"
       />
     </div>
   </div>
