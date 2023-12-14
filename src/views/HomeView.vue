@@ -10,8 +10,6 @@ const cursorColour: Ref<Cursor> = ref<Cursor>({
   outline: invertHex('#F1F5F9')
 })
 
-// const cursorColour: Ref<string> = ref<string>('#F1F5F9')
-
 const grid = ref<InstanceType<typeof BoxGrid>>(null as never)
 
 const toggleZoom = () => {
