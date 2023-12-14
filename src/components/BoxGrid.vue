@@ -146,7 +146,7 @@ const emitCursorColourChange = (e: String) => {
   emit('update:cursor-colour', e)
 }
 
-const testClick = () => {
+const toggleZoom = () => {
   if (gridStyleClass.value !== 'zoom-out zoom-out-end') {
     gridStyleClass.value = 'zoom-out zoom-out-end'
   } else {
@@ -160,13 +160,12 @@ const testClick = () => {
       3000
     )
   }
-  console.log('test click')
 }
 </script>
 
 <template>
   <div class="w-screen h-screen">
-    <div ref="grid" class="absolute grid" :class="gridStyleClass" @click="testClick">
+    <div ref="grid" class="absolute grid" :class="gridStyleClass" @click="toggleZoom">
       <GridCell
         v-for="[x, y] in allCoords"
         :key="`${x},${y}`"
