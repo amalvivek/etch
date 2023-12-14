@@ -42,14 +42,8 @@ const showPicker = () => {
   }
 }
 
-let emitted: boolean = false
-
 const emitColour = (e: Event) => {
-  if (!emitted || e.type == 'change') {
-    emitted = true
-    setTimeout(() => (emitted = false), 500)
-    emit('cursorColourChange', (e.target as HTMLInputElement).value)
-  }
+  emit('cursorColourChange', (e.target as HTMLInputElement).value)
 }
 
 defineExpose({ showPicker })
@@ -65,17 +59,12 @@ defineExpose({ showPicker })
       @mouseover="showTooltip = true"
       @mouseleave="showTooltip = false"
       @click="showPicker"
-    ></div>
-    <div style="transform: translate(-50%, -50%)" class="invisible fixed top-2/4 left-2/4">
-      <input
-        ref="picker"
-        type="color"
-        :value="cursorColour"
-        @change="emitColour"
-        @input="emitColour"
-        class="w-[40px] h-[40px]"
-      />
+    >
+      <div class="">
+        <input ref="picker" type="color" :value="cursorColour" @change="emitColour" />
+      </div>
     </div>
+
     <div
       v-if="showTooltip"
       :key="`${x}-${y}-${isActive}`"
@@ -100,5 +89,18 @@ defineExpose({ showPicker })
 
 .cursor {
   background-color: v-bind(cursorColour);
+}
+
+input[type='color'] {
+  -webkit-appearance: none;
+  border-width: 1px;
+  width: 40px;
+  height: 40px;
+}
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type='color']::-webkit-color-swatch {
+  border: none;
 }
 </style>

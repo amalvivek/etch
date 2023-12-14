@@ -4,3 +4,8 @@ export interface CellData {
     colour: String,
     isActive: Boolean
 }
+
+export interface Cursor {
+    colour: string,
+    outline: string | null
+}
