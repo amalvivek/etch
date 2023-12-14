@@ -42,7 +42,7 @@ const gridData = ref<CellData[][]>(
   )
 )
 
-const cellRefs = ref<ComponentPublicInstance[][]>(
+const cellRefs = ref<InstanceType<typeof GridCell>[][]>(
   Array.from({ length: props.canvasSize }, () => [])
 )
 const grid = ref<HTMLDivElement | null>(null)
@@ -128,10 +128,6 @@ const zoomOutCellSize = computed(() => {
   return Math.floor(Math.min(window.innerHeight, window.innerWidth) / props.canvasSize)
 })
 
-// const gridStartStyle = computed(() => {
-//   return `repeat(${props.canvasSize}, ${zoomOutCellSize.value}px)`
-// })
-
 const gridDefaultStyle = computed(() => {
   return `repeat(${props.canvasSize}, ${props.cellSize}px)`
 })
@@ -147,6 +143,7 @@ const emitCursorColourChange = (e: String) => {
 }
 
 const toggleZoom = () => {
+  console.log('in box zoom')
   if (gridStyleClass.value !== 'zoom-out zoom-out-end') {
     gridStyleClass.value = 'zoom-out zoom-out-end'
   } else {
@@ -161,16 +158,22 @@ const toggleZoom = () => {
     )
   }
 }
+
+const toggleColourPicker = () => {
+  cellRefs.value[activeCoord.value[0]][activeCoord.value[1]].showPicker()
+}
+
+defineExpose({ toggleZoom, toggleColourPicker })
 </script>
 
 <template>
   <div class="w-screen h-screen">
-    <div ref="grid" class="absolute grid" :class="gridStyleClass" @click="toggleZoom">
+    <div ref="grid" class="absolute grid" :class="gridStyleClass">
       <GridCell
         v-for="[x, y] in allCoords"
         :key="`${x},${y}`"
         :cell-data="gridData[x][y]"
-        :ref="(el) => cellRefs[x].push(el as ComponentPublicInstance)"
+        :ref="(el) => cellRefs[x].push(el as InstanceType<typeof GridCell>)"
         :cursor-colour="cursorColour"
         @cursor-colour-change="emitCursorColourChange"
       />

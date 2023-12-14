@@ -2,24 +2,28 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { type Ref, ref } from 'vue'
 
+const emit = defineEmits(['zoom', 'showColourPicker'])
+
 const menuClass: Ref<string> = ref<string>('menu-start')
 const cogClass: Ref<string> = ref<string>('')
-const menuItemsClass: Ref<string> = ref<string>('')
-const menuItemsHidden: Ref<boolean> = ref<boolean>(true)
+const menuItemsClass: Ref<string> = ref<string>('menu-items-start')
+const toggle: Ref<boolean> = ref<boolean>(true)
 
 const toggleMenu = () => {
-  console.log('toggleMenu')
-  if (menuItemsHidden.value) {
+  if (toggle.value) {
     menuClass.value = 'grow-menu'
     cogClass.value = 'cog-spin-open'
-    menuItemsHidden.value = false
     menuItemsClass.value = 'menu-items-appear'
   } else {
     menuClass.value = 'shrink-menu'
     cogClass.value = 'cog-spin-close'
-    menuItemsHidden.value = true
     menuItemsClass.value = 'menu-items-disappear'
   }
+  toggle.value = !toggle.value
+}
+
+const executeSetting = (action: 'zoom' | 'showColourPicker') => {
+  emit(action)
 }
 </script>
 
@@ -30,10 +34,20 @@ const toggleMenu = () => {
     @click="toggleMenu"
   >
     <div id="menuItems" class="flex flex-col gap-y-3 items-center justify-center">
-      <font-awesome-icon icon="gear" :class="menuItemsClass" />
-      <font-awesome-icon icon="gear" :class="menuItemsClass" />
+      <font-awesome-icon
+        icon="paintbrush"
+        :class="menuItemsClass"
+        class="menu-item"
+        @click="executeSetting('showColourPicker')"
+      />
+      <font-awesome-icon
+        icon="magnifying-glass-plus"
+        :class="menuItemsClass"
+        class="menu-item"
+        @click="executeSetting('zoom')"
+      />
       <hr
-        class="h-0 border-t-[1px] border-slate-400 w-[60%] shadow-2xl rounded-lg"
+        class="menu-item h-0 border-t-[1px] border-slate-400 w-[60%] shadow-2xl rounded-lg"
         :class="menuItemsClass"
       />
     </div>
@@ -41,7 +55,7 @@ const toggleMenu = () => {
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .menu-start {
   height: 2.5rem;
 }
@@ -67,12 +81,12 @@ const toggleMenu = () => {
 }
 
 .grow-menu {
-  animation: grower 300ms linear;
+  animation: grower 500ms linear;
   animation-fill-mode: forwards;
 }
 
 .shrink-menu {
-  animation: shrinker 300ms linear;
+  animation: shrinker 500ms linear;
   animation-fill-mode: forwards;
 }
 
@@ -101,11 +115,9 @@ const toggleMenu = () => {
     transform: translateY(0);
     opacity: 1;
   }
-  80% {
-    opacity: 0;
-  }
+
   0% {
-    transform: translateY(1500%);
+    transform: translateY(1000%);
     opacity: 0;
   }
 }
@@ -115,39 +127,37 @@ const toggleMenu = () => {
     transform: translateY(0);
     opacity: 1;
   }
+  45% {
+    opacity: 0;
+  }
   100% {
-    transform: translateY(1500%);
+    transform: translateY(1000%);
     opacity: 0;
   }
 }
 
+.menu-items-start {
+  transform: translateY(1000%);
+  opacity: 0;
+}
+
 .menu-items-appear {
-  animation: appear 300ms ease-in forwards;
+  animation: appear 100ms cubic-bezier(0, 1, 0, 1) backwards;
 }
 
 .menu-items-disappear {
-  animation: disappear 300ms ease-out forwards;
-}
-/*
-.menu-items {
-
-  transition-timing-function: ease-in;
-
-
-  transition: 300ms;
-
-
-  transform: translateY(0);
+  animation: disappear 300ms cubic-bezier(1, 0, 1, 0) forwards;
 }
 
-.menu-items-hidden {
+@for $i from 1 through 3 {
+  .menu-items-disappear:nth-child(#{$i}n) {
+    animation-delay: #{($i - 1) * 0.2}s;
+  }
+}
 
-  transition-timing-function: ease-out;
-
-/
-  transition: 300ms;
-
-
-  transform: translateY(1500%);
-} */
+@for $i from 1 through 3 {
+  .menu-items-appear:nth-child(#{$i}n) {
+    animation-delay: #{(3 - $i) * 0.2}s;
+  }
+}
 </style>

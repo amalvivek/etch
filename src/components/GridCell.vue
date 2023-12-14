@@ -33,7 +33,13 @@ const picker = ref<HTMLInputElement>(null as never)
 
 const showPicker = () => {
   showTooltip.value = false
-  picker.value.click()
+  if (picker.value.matches(':focus')) {
+    console.log('blurring')
+    picker.value.blur()
+  } else {
+    console.log('focussing')
+    picker.value.click()
+  }
 }
 
 let emitted: boolean = false
@@ -45,6 +51,8 @@ const emitColour = (e: Event) => {
     emit('cursorColourChange', (e.target as HTMLInputElement).value)
   }
 }
+
+defineExpose({ showPicker })
 </script>
 
 <template>
