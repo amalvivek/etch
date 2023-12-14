@@ -5,12 +5,12 @@ import type { Cursor } from '@/shared.types'
 import { invertHex } from '@/shared.utils'
 import { ref, type Ref } from 'vue'
 
-// const cursorColour: Ref<Cursor> = ref<Cursor>({
-//   colour: '#F1F5F9',
-//   outline: invertHex('#F1F5F9')
-// })
+const cursorColour: Ref<Cursor> = ref<Cursor>({
+  colour: '#F1F5F9',
+  outline: invertHex('#F1F5F9')
+})
 
-const cursorColour: Ref<string> = ref<string>('#F1F5F9')
+// const cursorColour: Ref<string> = ref<string>('#F1F5F9')
 
 const grid = ref<InstanceType<typeof BoxGrid>>(null as never)
 

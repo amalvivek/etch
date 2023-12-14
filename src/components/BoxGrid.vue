@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, type ComponentPublicInstance, type Ref } from 'vue'
+import {
+  ref,
+  onMounted,
+  computed,
+  type ComponentPublicInstance,
+  type Ref,
+  type PropType
+} from 'vue'
 import GridCell from './GridCell.vue'
-import { type CellData } from '@/shared.types'
+import type { CellData, Cursor } from '@/shared.types'
 
 const emit = defineEmits(['update:cursor-colour'])
 
@@ -15,7 +22,7 @@ const props = defineProps({
     required: true
   },
   cursorColour: {
-    type: String,
+    type: Object as PropType<Cursor>,
     required: true
   }
 })
@@ -105,7 +112,7 @@ const onKeyDownAction = (e: KeyboardEvent) => {
 
 const updateGrid = (index: number, increment: number) => {
   gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = false
-  gridData.value[activeCoord.value[0]][activeCoord.value[1]].colour = props.cursorColour
+  gridData.value[activeCoord.value[0]][activeCoord.value[1]].colour = props.cursorColour.colour
   activeCoord.value[index] += increment
   gridData.value[activeCoord.value[0]][activeCoord.value[1]].isActive = true
   scrollToCell(

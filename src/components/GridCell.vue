@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CellData } from '@/shared.types.ts'
+import type { CellData, Cursor } from '@/shared.types.ts'
 import { toRefs, type PropType, ref, computed, type Ref } from 'vue'
 import { invertHex } from '@/shared.utils'
 
@@ -11,22 +11,22 @@ const props = defineProps({
     required: true
   },
   cursorColour: {
-    type: String,
+    type: Object as PropType<Cursor>,
     required: true
   }
 })
 
 const { x, y, colour, isActive } = toRefs(props.cellData)
 
-const outline = computed(() => {
-  if (colour.value === props.cursorColour) {
-    return `outline-style: solid; outline-color: ${invertHex(props.cursorColour)}`
+const cursorStyle = computed(() => {
+  const bg = `background-color: ${props.cursorColour.colour};`
+  if (colour.value === props.cursorColour.colour) {
+    return ` outline-style: solid; outline-color: ${props.cursorColour.outline}`
   }
-  return ''
+  return bg
 })
 
 const showTooltip: Ref<boolean> = ref<boolean>(false)
-// const showColourPicker: Ref<boolean> = ref<boolean>(false)
 
 const cursor = ref<HTMLDivElement>(null as never)
 const picker = ref<HTMLInputElement>(null as never)
@@ -43,7 +43,10 @@ const showPicker = () => {
 }
 
 const emitColour = (e: Event) => {
-  emit('cursorColourChange', (e.target as HTMLInputElement).value)
+  emit('cursorColourChange', {
+    colour: (e.target as HTMLInputElement).value,
+    outline: invertHex((e.target as HTMLInputElement).value)
+  })
 }
 
 defineExpose({ showPicker })
@@ -55,13 +58,13 @@ defineExpose({ showPicker })
       ref="cursor"
       v-if="isActive"
       class="h-full w-full blink_me cursor"
-      :style="outline"
+      :style="cursorStyle"
       @mouseover="showTooltip = true"
       @mouseleave="showTooltip = false"
       @click="showPicker"
     >
       <div class="">
-        <input ref="picker" type="color" :value="cursorColour" @change="emitColour" />
+        <input ref="picker" type="color" :value="cursorColour.colour" @change="emitColour" />
       </div>
     </div>
 
@@ -85,10 +88,6 @@ defineExpose({ showPicker })
   50% {
     opacity: 0;
   }
-}
-
-.cursor {
-  background-color: v-bind(cursorColour);
 }
 
 input[type='color'] {
