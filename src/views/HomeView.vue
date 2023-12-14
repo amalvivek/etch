@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import BoxGrid from '@/components/BoxGrid.vue'
-import { ref } from 'vue'
+import OptionsContainer from '@/components/OptionsContainer.vue'
+import { ref, type Ref } from 'vue'
 
-const cursorColour: String = ref<String>('#F1F5F9')
+const cursorColour: Ref<string> = ref<string>('#F1F5F9')
 </script>
 
 <template>
@@ -13,5 +14,6 @@ const cursorColour: String = ref<String>('#F1F5F9')
       :cell-size="40"
       v-model:cursor-colour="cursorColour"
     />
+    <OptionsContainer />
   </div>
 </template>

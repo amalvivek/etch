@@ -20,10 +20,6 @@ const props = defineProps({
   }
 })
 
-const cellCount = props.canvasSize * props.canvasSize
-
-// const activeIndex = ref<number>(Math.floor(cellCount / 2))
-
 const startingCoord = Math.floor(props.canvasSize / 2)
 const activeCoord: Ref<[number, number]> = ref<[number, number]>([startingCoord, startingCoord])
 
@@ -66,9 +62,9 @@ const scrollToCell = (cell: ComponentPublicInstance, grid: HTMLDivElement | null
     const cellRect = cell.$el.getBoundingClientRect()
 
     yCoord.value =
-      cellRect.top - gridRect.top + grid.scrollTop - window.innerHeight / 2 + cellRect.height
+      cellRect.top - gridRect.top + grid.scrollTop - window.innerHeight / 2 + cellRect.height / 2
     xCoord.value =
-      cellRect.left - gridRect.left + grid.scrollLeft - window.innerWidth / 2 + cellRect.width
+      cellRect.left - gridRect.left + grid.scrollLeft - window.innerWidth / 2 + cellRect.width / 2
 
     window.scrollTo({
       top: yCoord.value,
@@ -124,31 +120,53 @@ onMounted(() => {
       cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
       grid.value
     )
-  }, 0)
+  }, 10)
   document.addEventListener('keydown', onKeyDownAction)
 })
 
-const gridStyle = computed(() => {
-  //   return `transform: translateX(-${translateByX.value}px) translateY(-${translateByY.value}px); grid-template-rows: repeat(${canvasSize.value}, ${cellSize.value}px);  grid-template-columns: repeat(${canvasSize.value}, ${cellSize.value}px); grid-auto-rows: ${cellSize.value}px`
-  return `grid-template-rows: repeat(${props.canvasSize}, ${props.cellSize}px);  grid-template-columns: repeat(${props.canvasSize}, ${props.cellSize}px); grid-auto-rows: ${props.cellSize}px`
+const zoomOutCellSize = computed(() => {
+  return Math.floor(Math.min(window.innerHeight, window.innerWidth) / props.canvasSize)
 })
 
-const gridStartStyle = computed(() => {
-  return `repeat(${props.canvasSize}, 0px)`
-})
+// const gridStartStyle = computed(() => {
+//   return `repeat(${props.canvasSize}, ${zoomOutCellSize.value}px)`
+// })
 
-const gridEndStyle = computed(() => {
+const gridDefaultStyle = computed(() => {
   return `repeat(${props.canvasSize}, ${props.cellSize}px)`
 })
 
+const gridZoomOutStyle = computed(() => {
+  return `repeat(${props.canvasSize}, ${zoomOutCellSize.value}px)`
+})
+
+const gridStyleClass: Ref<string> = ref<string>('grid-default-style')
+
 const emitCursorColourChange = (e: String) => {
   emit('update:cursor-colour', e)
+}
+
+const testClick = () => {
+  if (gridStyleClass.value !== 'zoom-out zoom-out-end') {
+    gridStyleClass.value = 'zoom-out zoom-out-end'
+  } else {
+    gridStyleClass.value = 'grid-default-style zoom-in'
+    setTimeout(
+      () =>
+        scrollToCell(
+          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+          grid.value
+        ),
+      3000
+    )
+  }
+  console.log('test click')
 }
 </script>
 
 <template>
   <div class="w-screen h-screen">
-    <div ref="grid" class="absolute grid grow" :style="gridStyle" @keyup.up.prevent>
+    <div ref="grid" class="absolute grid" :class="gridStyleClass" @click="testClick">
       <GridCell
         v-for="[x, y] in allCoords"
         :key="`${x},${y}`"
@@ -163,20 +181,51 @@ const emitCursorColourChange = (e: String) => {
 
 <style scoped>
 /* .grow {
-  animation: gridStartSize 3s cubic-bezier(0.37, 0.84, 0.95, 0.3);
+  animation: grid-start-size 3s cubic-bezier(0.37, 0.84, 0.95, 0.3);
+  animation: grid-start-size 3s linear;
 }
 
-@keyframes gridStartSize {
+@keyframes grid-start-size {
   0% {
     grid-template-rows: v-bind(gridStartStyle);
     grid-template-columns: v-bind(gridStartStyle);
-    grid-auto-rows: 0px;
+    grid-auto-rows: v-bind(zoomOutCellSize) px;
   }
 } */
 
-.gridStyle {
-  grid-template-rows: v-bind(gridEndStyle);
-  grid-template-columns: v-bind(gridEndStyle);
-  grid-auto-rows: 0px;
+.grid-default-style {
+  grid-template-rows: v-bind(gridDefaultStyle);
+  grid-template-columns: v-bind(gridDefaultStyle);
+  grid-auto-rows: v-bind(cellSize) px;
+}
+
+.zoom-out {
+  animation: grid-zoom-out 3s linear;
+}
+
+@keyframes grid-zoom-out {
+  0% {
+    grid-template-rows: v-bind(gridDefaultStyle);
+    grid-template-columns: v-bind(gridDefaultStyle);
+    grid-auto-rows: v-bind(cellSize) px;
+  }
+}
+
+.zoom-out-end {
+  grid-template-rows: v-bind(gridZoomOutStyle);
+  grid-template-columns: v-bind(gridZoomOutStyle);
+  grid-auto-rows: v-bind(zoomOutCellSize) px;
+}
+
+.zoom-in {
+  animation: grid-zoom-in 3s linear;
+}
+
+@keyframes grid-zoom-in {
+  0% {
+    grid-template-rows: v-bind(gridZoomOutStyle);
+    grid-template-columns: v-bind(gridZoomOutStyle);
+    grid-auto-rows: v-bind(zoomOutCellSize) px;
+  }
 }
 </style>
