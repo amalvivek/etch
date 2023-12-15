@@ -34,24 +34,34 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
     @click="toggleMenu"
   >
     <div id="menuItems" class="flex flex-col gap-y-3 items-center justify-center">
-      <font-awesome-icon
-        icon="eraser"
-        :class="menuItemsClass"
-        class="menu-item hover:scale-125"
-        @click="executeSetting('clear')"
-      />
-      <font-awesome-icon
-        icon="paintbrush"
-        :class="menuItemsClass"
-        class="menu-item hover:scale-125"
-        @click="executeSetting('showColourPicker')"
-      />
-      <font-awesome-icon
-        icon="magnifying-glass-plus"
-        :class="menuItemsClass"
-        class="menu-item hover:scale-125"
-        @click="executeSetting('zoom')"
-      />
+      <div class="menu-item">
+        <font-awesome-icon
+          icon="eraser"
+          :class="menuItemsClass"
+          class="hover:scale-125"
+          @click="executeSetting('clear')"
+        />
+        <div class="tooltip">Clear Canvas</div>
+      </div>
+      <div class="menu-item">
+        <font-awesome-icon
+          icon="paintbrush"
+          :class="menuItemsClass"
+          class="menu-item hover:scale-125"
+          @click="executeSetting('showColourPicker')"
+        />
+        <div class="tooltip">Pick Colour</div>
+      </div>
+      <div class="menu-item">
+        <font-awesome-icon
+          icon="magnifying-glass-plus"
+          :class="menuItemsClass"
+          class="menu-item hover:scale-125"
+          @click="executeSetting('zoom')"
+        />
+        <div class="tooltip">Zoom</div>
+      </div>
+
       <hr
         class="menu-item h-0 border-t-[1px] border-slate-400 w-[60%] shadow-2xl rounded-lg"
         :class="menuItemsClass"
@@ -77,7 +87,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   }
 
   100% {
-    height: 8.5rem;
+    height: 10rem;
   }
 }
 
@@ -87,12 +97,12 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   }
 
   0% {
-    height: 8.5rem;
+    height: 10rem;
   }
 }
 
 .grow-menu {
-  animation: grower 100ms linear;
+  animation: grower 150ms linear;
   animation-fill-mode: forwards;
 }
 
@@ -157,7 +167,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
 }
 
 .menu-items-disappear {
-  animation: disappear 10ms cubic-bezier(0, 1, 0, 1) forwards;
+  animation: disappear 200ms cubic-bezier(0, 1, 0, 1) forwards;
 }
 
 @for $i from 1 through 4 {
@@ -172,16 +182,32 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   }
 }
 
-// div:hover #toggle-button {
-//   animation: hover-animation 1s infinite ease-in-out;
-// }
+.tooltip {
+  position: absolute;
+  top: -20%;
+  width: fit-content;
 
-// @keyframes hover-animation {
-//   25% {
-//     transform: scale(0.75);
-//   }
-//   75% {
-//     transform: scale(1.25);
-//   }
-// }
+  transform: translateX(-3rem);
+
+  background: black;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+
+  font-size: 0.8em;
+  white-space: nowrap;
+  text-align: end;
+
+  opacity: 0;
+  visibility: hidden;
+}
+
+.menu-item {
+  position: relative;
+}
+.menu-item:hover .tooltip {
+  right: 0%;
+  opacity: 1;
+  visibility: visible;
+}
 </style>
