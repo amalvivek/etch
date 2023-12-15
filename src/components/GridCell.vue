@@ -63,8 +63,14 @@ defineExpose({ showPicker })
       @mouseleave="showTooltip = false"
       @click="showPicker"
     >
-      <div class="">
-        <input ref="picker" type="color" :value="cursorColour.colour" @change="emitColour" />
+      <div>
+        <input
+          ref="picker"
+          type="color"
+          class="cursor-pointer"
+          :value="cursorColour.colour"
+          @change="emitColour"
+        />
       </div>
     </div>
 

@@ -2,7 +2,7 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { type Ref, ref } from 'vue'
 
-const emit = defineEmits(['zoom', 'showColourPicker'])
+const emit = defineEmits(['zoom', 'showColourPicker', 'clear'])
 
 const menuClass: Ref<string> = ref<string>('menu-start')
 const cogClass: Ref<string> = ref<string>('')
@@ -22,7 +22,7 @@ const toggleMenu = () => {
   toggle.value = !toggle.value
 }
 
-const executeSetting = (action: 'zoom' | 'showColourPicker') => {
+const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   emit(action)
 }
 </script>
@@ -30,20 +30,26 @@ const executeSetting = (action: 'zoom' | 'showColourPicker') => {
 <template>
   <div
     id="menuContainer"
-    :class="`${menuClass} fixed bottom-5 right-5 bg-slate-50 h-auto w-10 rounded-[1rem] shadow-2xl shadow-black flex flex-col gap-y-3 items-center justify-end`"
+    :class="`${menuClass} fixed bottom-5 right-5 bg-slate-50 h-auto w-10 rounded-[1rem] shadow-sm shadow-black flex flex-col gap-y-3 items-center justify-end cursor-pointer hover:scale-[1.05] hover:shadow-xl`"
     @click="toggleMenu"
   >
     <div id="menuItems" class="flex flex-col gap-y-3 items-center justify-center">
       <font-awesome-icon
+        icon="eraser"
+        :class="menuItemsClass"
+        class="menu-item hover:scale-125"
+        @click="executeSetting('clear')"
+      />
+      <font-awesome-icon
         icon="paintbrush"
         :class="menuItemsClass"
-        class="menu-item"
+        class="menu-item hover:scale-125"
         @click="executeSetting('showColourPicker')"
       />
       <font-awesome-icon
         icon="magnifying-glass-plus"
         :class="menuItemsClass"
-        class="menu-item"
+        class="menu-item hover:scale-125"
         @click="executeSetting('zoom')"
       />
       <hr
@@ -51,7 +57,12 @@ const executeSetting = (action: 'zoom' | 'showColourPicker') => {
         :class="menuItemsClass"
       />
     </div>
-    <font-awesome-icon id="toggleButton" icon="gear" :class="cogClass" class="mb-3 bg-white" />
+    <font-awesome-icon
+      id="toggle-button"
+      icon="gear"
+      :class="cogClass"
+      class="mb-3 bg-white hover:scale-125"
+    />
   </div>
 </template>
 
@@ -66,7 +77,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker') => {
   }
 
   100% {
-    height: 7rem;
+    height: 8.5rem;
   }
 }
 
@@ -76,22 +87,22 @@ const executeSetting = (action: 'zoom' | 'showColourPicker') => {
   }
 
   0% {
-    height: 7rem;
+    height: 8.5rem;
   }
 }
 
 .grow-menu {
-  animation: grower 500ms linear;
+  animation: grower 100ms linear;
   animation-fill-mode: forwards;
 }
 
 .shrink-menu {
-  animation: shrinker 500ms linear;
+  animation: shrinker 150ms linear;
   animation-fill-mode: forwards;
 }
 
 .cog-spin-open {
-  animation: spin-clockwise 300ms linear forwards;
+  animation: spin-clockwise 150ms linear forwards;
 }
 
 @keyframes spin-clockwise {
@@ -101,7 +112,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker') => {
 }
 
 .cog-spin-close {
-  animation: spin-anticlockwise 300ms linear forwards;
+  animation: spin-anticlockwise 150ms linear forwards;
 }
 
 @keyframes spin-anticlockwise {
@@ -127,7 +138,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker') => {
     transform: translateY(0);
     opacity: 1;
   }
-  45% {
+  30% {
     opacity: 0;
   }
   100% {
@@ -142,22 +153,35 @@ const executeSetting = (action: 'zoom' | 'showColourPicker') => {
 }
 
 .menu-items-appear {
-  animation: appear 100ms cubic-bezier(0, 1, 0, 1) backwards;
+  animation: appear 200ms cubic-bezier(0, 1, 0, 1) backwards;
 }
 
 .menu-items-disappear {
-  animation: disappear 300ms cubic-bezier(1, 0, 1, 0) forwards;
+  animation: disappear 10ms cubic-bezier(0, 1, 0, 1) forwards;
 }
 
-@for $i from 1 through 3 {
+@for $i from 1 through 4 {
   .menu-items-disappear:nth-child(#{$i}n) {
-    animation-delay: #{($i - 1) * 0.2}s;
+    animation-delay: #{($i - 1) * 50}ms;
   }
 }
 
-@for $i from 1 through 3 {
+@for $i from 1 through 4 {
   .menu-items-appear:nth-child(#{$i}n) {
-    animation-delay: #{(3 - $i) * 0.2}s;
+    animation-delay: #{(4 - $i) * 50}ms;
   }
 }
+
+// div:hover #toggle-button {
+//   animation: hover-animation 1s infinite ease-in-out;
+// }
+
+// @keyframes hover-animation {
+//   25% {
+//     transform: scale(0.75);
+//   }
+//   75% {
+//     transform: scale(1.25);
+//   }
+// }
 </style>
