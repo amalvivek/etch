@@ -6,18 +6,21 @@ const emit = defineEmits(['zoom', 'showColourPicker', 'clear'])
 
 const menuClass: Ref<string> = ref<string>('menu-start')
 const cogClass: Ref<string> = ref<string>('')
-const menuItemsClass: Ref<string> = ref<string>('menu-items-start')
+const menuItemClass: Ref<string> = ref<string>('menu-items-start')
+const menuItemsClass: Ref<string> = ref<string>('hidden')
 const toggle: Ref<boolean> = ref<boolean>(true)
 
 const toggleMenu = () => {
   if (toggle.value) {
     menuClass.value = 'grow-menu'
     cogClass.value = 'cog-spin-open'
-    menuItemsClass.value = 'menu-items-appear'
+    menuItemClass.value = 'menu-item-appear'
+    menuItemsClass.value = ''
   } else {
     menuClass.value = 'shrink-menu'
     cogClass.value = 'cog-spin-close'
-    menuItemsClass.value = 'menu-items-disappear'
+    menuItemClass.value = 'menu-item-disappear'
+    menuItemsClass.value = 'hidden'
   }
   toggle.value = !toggle.value
 }
@@ -30,32 +33,28 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
 <template>
   <div
     id="menuContainer"
-    :class="`${menuClass} fixed bottom-5 right-5 bg-slate-50 h-auto w-10 rounded-[1rem] shadow-sm shadow-black flex flex-col gap-y-3 items-center justify-end cursor-pointer hover:scale-[1.05] hover:shadow-xl`"
+    :class="`${menuClass} fixed bottom-5 right-5 bg-slate-50 w-10 rounded-[1rem] shadow-sm shadow-black flex flex-col gap-y-3 items-center justify-end cursor-pointer hover:scale-[1.05] hover:shadow-xl`"
     @click="toggleMenu"
   >
-    <div id="menuItems" class="flex flex-col gap-y-3 items-center justify-center">
-      <div class="menu-item">
-        <font-awesome-icon
-          icon="eraser"
-          :class="menuItemsClass"
-          class="hover:scale-125"
-          @click="executeSetting('clear')"
-        />
+    <div
+      id="menuItems"
+      :class="`${menuItemsClass} flex flex-col gap-y-3 items-center justify-center`"
+    >
+      <div class="menu-item" :class="menuItemClass">
+        <font-awesome-icon icon="eraser" class="hover:scale-125" @click="executeSetting('clear')" />
         <div class="tooltip">Clear Canvas</div>
       </div>
-      <div class="menu-item">
+      <div class="menu-item" :class="menuItemClass">
         <font-awesome-icon
           icon="paintbrush"
-          :class="menuItemsClass"
           class="menu-item hover:scale-125"
           @click="executeSetting('showColourPicker')"
         />
         <div class="tooltip">Pick Colour</div>
       </div>
-      <div class="menu-item">
+      <div class="menu-item" :class="menuItemClass">
         <font-awesome-icon
           icon="magnifying-glass-plus"
-          :class="menuItemsClass"
           class="menu-item hover:scale-125"
           @click="executeSetting('zoom')"
         />
@@ -64,7 +63,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
 
       <hr
         class="menu-item h-0 border-t-[1px] border-slate-400 w-[60%] shadow-2xl rounded-lg"
-        :class="menuItemsClass"
+        :class="menuItemClass"
       />
     </div>
     <font-awesome-icon
@@ -162,22 +161,22 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   opacity: 0;
 }
 
-.menu-items-appear {
+.menu-item-appear {
   animation: appear 200ms cubic-bezier(0, 1, 0, 1) backwards;
 }
 
-.menu-items-disappear {
+.menu-item-disappear {
   animation: disappear 200ms cubic-bezier(0, 1, 0, 1) forwards;
 }
 
 @for $i from 1 through 4 {
-  .menu-items-disappear:nth-child(#{$i}n) {
+  .menu-item-disappear:nth-child(#{$i}n) {
     animation-delay: #{($i - 1) * 50}ms;
   }
 }
 
 @for $i from 1 through 4 {
-  .menu-items-appear:nth-child(#{$i}n) {
+  .menu-item-appear:nth-child(#{$i}n) {
     animation-delay: #{(4 - $i) * 50}ms;
   }
 }
@@ -207,6 +206,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
 }
 .menu-item:hover .tooltip {
   right: 0%;
+  margin-top: 1px;
   opacity: 1;
   visibility: visible;
 }
