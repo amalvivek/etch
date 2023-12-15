@@ -34,10 +34,8 @@ const picker = ref<HTMLInputElement>(null as never)
 const showPicker = () => {
   showTooltip.value = false
   if (picker.value.matches(':focus')) {
-    console.log('blurring')
     picker.value.blur()
   } else {
-    console.log('focussing')
     picker.value.click()
   }
 }

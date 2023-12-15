@@ -27,6 +27,8 @@ const props = defineProps({
   }
 })
 
+// Initialise grid
+
 const startingCoord = Math.floor(props.canvasSize / 2)
 const activeCoord: Ref<[number, number]> = ref<[number, number]>([startingCoord, startingCoord])
 
@@ -54,10 +56,9 @@ const cellRefs = ref<InstanceType<typeof GridCell>[][]>(
 )
 const grid = ref<HTMLDivElement | null>(null)
 
-const xCoord = ref<number>(0)
-const yCoord = ref<number>(0)
+// Scrolling mechanism
 
-let scrolled: boolean = false
+let scrolled: boolean = false // debounce scroll
 
 const scrollToCell = (cell: ComponentPublicInstance, grid: HTMLDivElement | null) => {
   if (cell && grid && !scrolled) {
@@ -68,19 +69,20 @@ const scrollToCell = (cell: ComponentPublicInstance, grid: HTMLDivElement | null
     const gridRect = grid.getBoundingClientRect()
     const cellRect = cell.$el.getBoundingClientRect()
 
-    yCoord.value =
+    const yCoord =
       cellRect.top - gridRect.top + grid.scrollTop - window.innerHeight / 2 + cellRect.height / 2
-    xCoord.value =
+    const xCoord =
       cellRect.left - gridRect.left + grid.scrollLeft - window.innerWidth / 2 + cellRect.width / 2
 
     window.scrollTo({
-      top: yCoord.value,
-      left: xCoord.value,
+      top: yCoord,
+      left: xCoord,
       behavior: 'smooth'
     })
   }
 }
 
+// Key controls
 const onKeyDownAction = (e: KeyboardEvent) => {
   e.preventDefault()
   switch (e.key) {
@@ -145,12 +147,7 @@ const gridZoomOutStyle = computed(() => {
 
 const gridStyleClass: Ref<string> = ref<string>('grid-default-style')
 
-const emitCursorColourChange = (e: String) => {
-  emit('update:cursor-colour', e)
-}
-
 const toggleZoom = () => {
-  console.log('in box zoom')
   if (gridStyleClass.value !== 'zoom-out zoom-out-end') {
     gridStyleClass.value = 'zoom-out zoom-out-end'
   } else {
@@ -161,9 +158,15 @@ const toggleZoom = () => {
           cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
           grid.value
         ),
-      3000
+      3001
     )
   }
+}
+
+// Colour Picking
+
+const emitCursorColourChange = (e: String) => {
+  emit('update:cursor-colour', e)
 }
 
 const toggleColourPicker = () => {
