@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { type Ref, ref } from 'vue'
+import OptionItem from '@/components/OptionItem.vue'
 
 const emit = defineEmits(['zoom', 'showColourPicker', 'clear'])
 
@@ -40,27 +41,24 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
       id="menuItems"
       :class="`${menuItemsClass} flex flex-col gap-y-3 items-center justify-center`"
     >
-      <div class="menu-item" :class="menuItemClass">
-        <font-awesome-icon icon="eraser" class="hover:scale-125" @click="executeSetting('clear')" />
-        <div class="tooltip">Clear Canvas</div>
-      </div>
-      <div class="menu-item" :class="menuItemClass">
-        <font-awesome-icon
-          icon="paintbrush"
-          class="menu-item hover:scale-125"
-          @click="executeSetting('showColourPicker')"
-        />
-        <div class="tooltip">Pick Colour</div>
-      </div>
-      <div class="menu-item" :class="menuItemClass">
-        <font-awesome-icon
-          icon="magnifying-glass-plus"
-          class="menu-item hover:scale-125"
-          @click="executeSetting('zoom')"
-        />
-        <div class="tooltip">Zoom</div>
-      </div>
-
+      <OptionItem
+        :class="menuItemClass"
+        icon="eraser"
+        tooltip="Clear Canvcas"
+        @select="executeSetting('clear')"
+      />
+      <OptionItem
+        :class="menuItemClass"
+        icon="paintbrush"
+        tooltip="Pick Colour"
+        @select="executeSetting('showColourPicker')"
+      />
+      <OptionItem
+        :class="menuItemClass"
+        icon="magnifying-glass-plus"
+        tooltip="Zoom"
+        @select="executeSetting('zoom')"
+      />
       <hr
         class="menu-item h-0 border-t-[1px] border-slate-400 w-[60%] shadow-2xl rounded-lg"
         :class="menuItemClass"
@@ -179,35 +177,5 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   .menu-item-appear:nth-child(#{$i}n) {
     animation-delay: #{(4 - $i) * 50}ms;
   }
-}
-
-.tooltip {
-  position: absolute;
-  top: -20%;
-  width: fit-content;
-
-  transform: translateX(-3rem);
-
-  background: black;
-  color: white;
-  padding: 6px 8px;
-  border-radius: 4px;
-
-  font-size: 0.8em;
-  white-space: nowrap;
-  text-align: end;
-
-  opacity: 0;
-  visibility: hidden;
-}
-
-.menu-item {
-  position: relative;
-}
-.menu-item:hover .tooltip {
-  right: 0%;
-  margin-top: 1px;
-  opacity: 1;
-  visibility: visible;
 }
 </style>

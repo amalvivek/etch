@@ -19,7 +19,7 @@ const props = defineProps({
 const { x, y, colour, isActive } = toRefs(props.cellData)
 
 const cursorStyle = computed(() => {
-  const bg = `background-color: ${props.cursorColour.colour};`
+  const bg = `height: 100% background-color: ${props.cursorColour.colour};`
   if (colour.value === props.cursorColour.colour) {
     return ` outline-style: solid; outline-color: ${props.cursorColour.outline}`
   }
@@ -63,15 +63,13 @@ defineExpose({ showPicker })
       @mouseleave="showTooltip = false"
       @click="showPicker"
     >
-      <div>
-        <input
-          ref="picker"
-          type="color"
-          class="cursor-pointer"
-          :value="cursorColour.colour"
-          @change="emitColour"
-        />
-      </div>
+      <input
+        ref="picker"
+        type="color"
+        class="cursor-pointer"
+        :value="cursorColour.colour"
+        @change="emitColour"
+      />
     </div>
 
     <div
@@ -99,8 +97,8 @@ defineExpose({ showPicker })
 input[type='color'] {
   -webkit-appearance: none;
   border-width: 1px;
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
 }
 input[type='color']::-webkit-color-swatch-wrapper {
   padding: 0;
