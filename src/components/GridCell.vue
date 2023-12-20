@@ -55,28 +55,22 @@ defineExpose({ showPicker })
     <div
       ref="cursor"
       v-if="isActive"
-      class="h-full w-full blink_me cursor"
+      class="h-full w-full cursor flex flex-col items-center"
       :style="cursorStyle"
       @mouseover="showTooltip = true"
       @mouseleave="showTooltip = false"
-      @click="showPicker"
     >
       <input
         ref="picker"
         type="color"
-        class="cursor-pointer"
+        class="cursor-pointer blink_me"
         :value="cursorColour.colour"
         @change="emitColour"
+        @click="showPicker"
       />
-    </div>
-
-    <div
-      v-if="showTooltip"
-      :key="`${x}-${y}-${isActive}`"
-      style="transform: translate(-50%, -50%)"
-      class="fixed top-2/4 left-2/4 mt-14 p-2.5 bg-black text-white rounded shadow-lg"
-    >
-      Show Colour Picker
+      <div v-if="showTooltip" :key="`${x}-${y}-${isActive}`" class="tooltip">
+        Show Colour Picker
+      </div>
     </div>
   </div>
 </template>
@@ -103,5 +97,21 @@ input[type='color']::-webkit-color-swatch-wrapper {
 }
 input[type='color']::-webkit-color-swatch {
   border: none;
+}
+
+.tooltip {
+  position: absolute;
+  width: fit-content;
+
+  transform: translateY(3rem);
+
+  background: black;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+
+  font-size: 0.8em;
+  white-space: nowrap;
+  text-align: end;
 }
 </style>
