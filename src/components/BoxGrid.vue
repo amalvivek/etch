@@ -5,7 +5,9 @@ import {
   computed,
   type ComponentPublicInstance,
   type Ref,
-  type PropType
+  type PropType,
+  watch,
+  toRefs
 } from 'vue'
 import GridCell from './GridCell.vue'
 import type { CellData, Cursor } from '@/shared.types'
@@ -23,6 +25,10 @@ const props = defineProps({
   },
   cursorColour: {
     type: Object as PropType<Cursor>,
+    required: true
+  },
+  scale: {
+    type: Number,
     required: true
   }
 })
@@ -147,21 +153,18 @@ const gridZoomOutStyle = computed(() => {
 
 const gridStyleClass: Ref<string> = ref<string>('grid-default-style')
 
-const toggleZoom = () => {
-  if (gridStyleClass.value !== 'zoom-out zoom-out-end') {
-    gridStyleClass.value = 'zoom-out zoom-out-end'
-  } else {
-    gridStyleClass.value = 'grid-default-style zoom-in'
-    setTimeout(
-      () =>
-        scrollToCell(
-          cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
-          grid.value
-        ),
-      3001
-    )
-  }
-}
+const { scale } = toRefs(props)
+
+watch(scale, () => {
+  setTimeout(
+    () =>
+      scrollToCell(
+        cellRefs.value[activeCoord.value[0]][activeCoord.value[1]] as ComponentPublicInstance,
+        grid.value
+      ),
+    500
+  )
+})
 
 // Colour Picking
 
@@ -173,12 +176,12 @@ const toggleColourPicker = () => {
   cellRefs.value[activeCoord.value[0]][activeCoord.value[1]].showPicker()
 }
 
-defineExpose({ toggleZoom, toggleColourPicker })
+defineExpose({ toggleColourPicker })
 </script>
 
 <template>
   <div class="w-screen h-screen">
-    <div ref="grid" class="absolute grid" :class="gridStyleClass">
+    <div ref="grid" class="absolute grid scaleable" :class="gridStyleClass">
       <GridCell
         v-for="[x, y] in allCoords"
         :key="`${x},${y}`"
@@ -204,6 +207,12 @@ defineExpose({ toggleZoom, toggleColourPicker })
     grid-auto-rows: v-bind(zoomOutCellSize) px;
   }
 } */
+
+.scaleable {
+  transform: scale(v-bind(scale));
+  transition: transform 300ms linear;
+  transform-origin: left top;
+}
 
 .grid-default-style {
   grid-template-rows: v-bind(gridDefaultStyle);

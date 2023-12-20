@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { type Ref, ref } from 'vue'
 import OptionItem from '@/components/OptionItem.vue'
 
-const emit = defineEmits(['zoom', 'showColourPicker', 'clear'])
+const emit = defineEmits(['zoom', 'showColourPicker', 'clear', 'openModal'])
 
 const menuClass: Ref<string> = ref<string>('menu-start')
 const cogClass: Ref<string> = ref<string>('')
@@ -14,19 +14,19 @@ const toggle: Ref<boolean> = ref<boolean>(true)
 const toggleMenu = () => {
   if (toggle.value) {
     menuClass.value = 'grow-menu'
-    cogClass.value = 'cog-spin-open'
+    cogClass.value = 'opened'
     menuItemClass.value = 'menu-item-appear'
     menuItemsClass.value = ''
   } else {
     menuClass.value = 'shrink-menu'
-    cogClass.value = 'cog-spin-close'
+    cogClass.value = 'closed'
     menuItemClass.value = 'menu-item-disappear'
     menuItemsClass.value = 'hidden'
   }
   toggle.value = !toggle.value
 }
 
-const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
+const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear' | 'openModal') => {
   emit(action)
 }
 </script>
@@ -34,13 +34,16 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
 <template>
   <div
     id="menuContainer"
-    :class="`${menuClass} fixed bottom-5 right-5 bg-slate-50 w-10 rounded-[1rem] shadow-sm shadow-black flex flex-col gap-y-3 items-center justify-end cursor-pointer hover:scale-[1.05] hover:shadow-xl`"
+    :class="`${menuClass} z-20 fixed bottom-5 right-5 bg-slate-50 w-10 rounded-[1rem] shadow-sm shadow-black flex flex-col gap-y-3 items-center justify-end cursor-pointer hover:scale-[1.05] hover:shadow-xl py-3`"
     @click="toggleMenu"
   >
-    <div
-      id="menuItems"
-      :class="`${menuItemsClass} flex flex-col gap-y-3 items-center justify-center`"
-    >
+    <div :class="`${menuItemsClass} flex flex-col gap-y-3 items-center justify-center`">
+      <OptionItem
+        :class="menuItemClass"
+        icon="sliders"
+        tooltip="Preferences"
+        @select="executeSetting('openModal')"
+      />
       <OptionItem
         :class="menuItemClass"
         icon="eraser"
@@ -68,7 +71,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
       id="toggle-button"
       icon="gear"
       :class="cogClass"
-      class="mb-3 bg-white hover:scale-125"
+      class="bg-white hover:scale-125 cog-spin"
     />
   </div>
 </template>
@@ -84,7 +87,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   }
 
   100% {
-    height: 10rem;
+    height: 12.5rem;
   }
 }
 
@@ -94,7 +97,7 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   }
 
   0% {
-    height: 10rem;
+    height: 12.5rem;
   }
 }
 
@@ -108,24 +111,17 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   animation-fill-mode: forwards;
 }
 
-.cog-spin-open {
-  animation: spin-clockwise 150ms linear forwards;
+.cog-spin {
+  transition: transform 150ms linear;
+  transform: rotate(0deg);
 }
 
-@keyframes spin-clockwise {
-  100% {
-    transform: rotate(-180deg);
-  }
+.cog-spin.opened {
+  transform: rotate(180deg);
 }
 
-.cog-spin-close {
-  animation: spin-anticlockwise 150ms linear forwards;
-}
-
-@keyframes spin-anticlockwise {
-  100% {
-    transform: rotate(180deg);
-  }
+.cog-spin.closed {
+  transform: rotate(-180deg);
 }
 
 @keyframes appear {
@@ -167,13 +163,13 @@ const executeSetting = (action: 'zoom' | 'showColourPicker' | 'clear') => {
   animation: disappear 200ms cubic-bezier(0, 1, 0, 1) forwards;
 }
 
-@for $i from 1 through 4 {
+@for $i from 1 through 5 {
   .menu-item-disappear:nth-child(#{$i}n) {
     animation-delay: #{($i - 1) * 50}ms;
   }
 }
 
-@for $i from 1 through 4 {
+@for $i from 1 through 5 {
   .menu-item-appear:nth-child(#{$i}n) {
     animation-delay: #{(4 - $i) * 50}ms;
   }
