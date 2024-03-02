@@ -7,4 +7,8 @@ import { RouterView } from 'vue-router'
   <RouterView />
 </template>
 
-<style></style>
+<style>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+</style>
