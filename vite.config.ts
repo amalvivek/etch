@@ -6,6 +6,8 @@ import tailwindcss from 'tailwindcss'
 import vitePluginSingleSpa from 'vite-plugin-single-spa'
 import vercel from 'vite-plugin-vercel'
 
+const plugins: any[] = [tailwindcss]
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -23,7 +25,7 @@ export default defineConfig({
   },
   css: {
     postcss: {
-      plugins: [tailwindcss]
+      plugins
     }
   },
   server: {
